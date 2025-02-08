@@ -22,4 +22,4 @@ Website_pageviews
 DELIVERABLES:
 1. Dashboards for Stakeholders to track performance regularly - Dashboard for CEO, Marketing Manager and Website Manager
 
-2.Detailed Analysis of Performance: To create a presentation for Funding on a data-driven growth story for potential investors
+2.  Detailed Analysis of Performance: To create a presentation for Funding on a data-driven growth story for potential investors
