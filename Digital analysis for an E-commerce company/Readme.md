@@ -1,8 +1,6 @@
-Our client is a newly launched e-commerce retail startup that sells stuffed 
-animal toys. 
-
 THE SITUATION: 
-CEO of an e-commerce company  is planning to secure next round of 
+Our client is a newly launched e-commerce retail startup that sells stuffed 
+animal toys. CEO of this company  is planning to secure next round of 
 funding, and they need the analytics team’s help to tell a compelling story to 
 investors. Therefore, the client wants dashboards for different stakeholders 
 which helps in tracking business metrics and KPIs regularly, so that the 
@@ -21,6 +19,6 @@ Products
 Website_sessions
 Website_pageviews
 
-Deliverables:
+DELIVERABLES:
 1. Dashboards for Stakeholders to track performance regularly - Dashboard for CEO, Marketing Manager and Website Manager
 2.Detailed Analysis of Performance: To create a presentation for Funding on a data-driven growth story for potential investors
