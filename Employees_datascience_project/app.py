@@ -4,6 +4,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.ticker import FuncFormatter
+import os
+
 
 # ✅ Enable wide layout for better content spacing
 st.set_page_config(layout="wide")
@@ -36,8 +38,14 @@ st.markdown(
 # Load and process data
 @st.cache_data
 def load_data():
-    df = pd.read_csv("Employees_datascience_project/data.csv")
+    script_dir = os.path.dirname(os.path.abspath(__file__))  # Get script directory
+    data_path = os.path.join(script_dir, "data.csv")  # Construct full path
 
+    if not os.path.exists(data_path):  # Check if file exists
+        st.error(f"⚠️ File not found: {data_path}")
+        st.stop()
+
+    df = pd.read_csv(data_path)
     # Convert birth_date and hire_date to datetime format
     df['birth_date'] = pd.to_datetime(df['birth_date'], format='%Y-%m-%d')
     df['hire_date'] = pd.to_datetime(df['hire_date'], format='%Y-%m-%d')
