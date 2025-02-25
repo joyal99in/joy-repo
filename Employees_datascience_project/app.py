@@ -36,7 +36,7 @@ st.markdown(
 # Load and process data
 @st.cache_data
 def load_data():
-    df = pd.read_csv("data.csv")
+    df = pd.read_csv("Employees_datascience_project/data.csv")
 
     # Convert birth_date and hire_date to datetime format
     df['birth_date'] = pd.to_datetime(df['birth_date'], format='%Y-%m-%d')
