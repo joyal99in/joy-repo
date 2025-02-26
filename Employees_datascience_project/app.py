@@ -38,14 +38,9 @@ st.markdown(
 # Load and process data
 @st.cache_data
 def load_data():
-    script_dir = os.path.dirname(os.path.abspath(__file__))  # Get script directory
-    data_path = os.path.join(script_dir, "data.csv")  # Construct full path
+    url = "https://drive.google.com/uc?id=1-RLcc33jBd4YYop6N2ICDFvrUzSNTUhi"  # Replace with your file ID
+    df = pd.read_csv(url)
 
-    if not os.path.exists(data_path):  # Check if file exists
-        st.error(f"⚠️ File not found: {data_path}")
-        st.stop()
-
-    df = pd.read_csv(data_path)
     # Convert birth_date and hire_date to datetime format
     df['birth_date'] = pd.to_datetime(df['birth_date'], format='%Y-%m-%d')
     df['hire_date'] = pd.to_datetime(df['hire_date'], format='%Y-%m-%d')
