@@ -3,11 +3,8 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from matplotlib.ticker import FuncFormatter
-import os
 import requests
-import io
-
+from io import StringIO
 
 # ✅ Enable wide layout for better content spacing
 st.set_page_config(layout="wide")
@@ -38,20 +35,41 @@ st.markdown(
 )
 
 # Load and process data
+import streamlit as st
+import pandas as pd
+import requests
+from io import StringIO
+
 @st.cache_data
 def load_data():
-    url = "https://drive.google.com/uc?id=1-RLcc33jBd4YYop6N2ICDFvrUzSNTUhi"
-    response = requests.get(url)
+    # Google Drive share link
+    gdrive_link = "https://drive.google.com/file/d/1-RLcc33jBd4YYop6N2ICDFvrUzSNTUhi/view?usp=sharing"
     
-    if response.status_code == 200:
-        df = pd.read_csv(io.StringIO(response.text))
-    else:
-        st.error("⚠️ Failed to download data. Please check the file URL.")
-        return pd.DataFrame()  # Return an empty DataFrame to avoid errors
+    # Extract file ID from the link
+    file_id = gdrive_link.split('/d/')[1].split('/')[0]
+    
+    # Construct the direct download URL
+    download_url = f"https://drive.google.com/uc?export=download&id={file_id}"
+    
+    # Fetch the CSV file
+    try:
+        response = requests.get(download_url)
+        response.raise_for_status()  # Raise an error if the request fails
+    except requests.exceptions.RequestException as e:
+        st.error(f"Failed to fetch data from Google Drive: {e}")
+        return None
+
+    # Try to parse the CSV content
+    try:
+        csv_content = StringIO(response.text)
+        df = pd.read_csv(csv_content, on_bad_lines='warn')
+    except pd.errors.ParserError as e:
+        st.error(f"Error parsing CSV: {e}")
+        return None
 
     # Convert birth_date and hire_date to datetime format
-    df['birth_date'] = pd.to_datetime(df['birth_date'], format='%Y-%m-%d')
-    df['hire_date'] = pd.to_datetime(df['hire_date'], format='%Y-%m-%d')
+    df['birth_date'] = pd.to_datetime(df['birth_date'], format='%Y-%m-%d', errors='coerce')
+    df['hire_date'] = pd.to_datetime(df['hire_date'], format='%Y-%m-%d', errors='coerce')
 
     # Correct way to calculate age
     reference_date = pd.Timestamp('1996-01-01')
@@ -62,10 +80,12 @@ def load_data():
 
     return df
 
-
-
 # Load data
 final_df = load_data()
+
+# Stop if data loading failed
+if final_df is None:
+    st.stop()
 
 # Sidebar filters
 st.sidebar.header("Filters")
@@ -90,7 +110,6 @@ gender_filter = dropdown_with_select_all("Select Gender", final_df['sex'].unique
 # Employment Status Filter
 left_filter = dropdown_with_select_all("Select Employment Status", final_df['left'].unique().tolist())
 
-
 # Apply filters
 filtered_df = final_df[
     (final_df['dept_name'].isin(dept_filter)) &
@@ -98,7 +117,6 @@ filtered_df = final_df[
     (final_df['sex'].isin(gender_filter)) &
     (final_df['left'].isin(left_filter))
 ]
-
 
 # Main app
 st.title("Employee Data Analytics Dashboard")
