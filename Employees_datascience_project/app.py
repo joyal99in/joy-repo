@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.ticker import FuncFormatter
 import os
+import requests
+import io
 
 
 # ✅ Enable wide layout for better content spacing
@@ -38,8 +40,14 @@ st.markdown(
 # Load and process data
 @st.cache_data
 def load_data():
-    url = "https://drive.google.com/uc?id=1-RLcc33jBd4YYop6N2ICDFvrUzSNTUhi"  # Replace with your file ID
-    df = pd.read_csv(url)
+    url = "https://drive.google.com/uc?id=1-RLcc33jBd4YYop6N2ICDFvrUzSNTUhi"
+    response = requests.get(url)
+    
+    if response.status_code == 200:
+        df = pd.read_csv(io.StringIO(response.text))
+    else:
+        st.error("⚠️ Failed to download data. Please check the file URL.")
+        return pd.DataFrame()  # Return an empty DataFrame to avoid errors
 
     # Convert birth_date and hire_date to datetime format
     df['birth_date'] = pd.to_datetime(df['birth_date'], format='%Y-%m-%d')
