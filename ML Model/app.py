@@ -1,64 +1,62 @@
-import streamlit as st
 import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
+from imblearn.pipeline import Pipeline as ImbPipeline
+from imblearn.over_sampling import SMOTE
+from xgboost import XGBClassifier
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 import joblib
+import requests
+import io
 
-# Load trained model
-pipeline = joblib.load("model_pipeline.pkl")
+# Fetch dataset from Google Drive
+gdrive_link = "https://drive.google.com/file/d/15mtxIvQaeA6I9WV3m-O3MGeHRGYdTpHa/view?usp=sharing"
+file_id = gdrive_link.split('/d/')[1].split('/')[0]
+download_url = f"https://drive.google.com/uc?export=download&id={file_id}"
 
-# Streamlit App
-st.title("Employee Churn Prediction")
-st.write("Upload a CSV file to predict whether employees will stay or leave.")
+# Download the file
+response = requests.get(download_url)
+response.raise_for_status()  # Check for errors
+final_df = pd.read_csv(io.StringIO(response.text))
 
-# Upload file
-uploaded_file = st.file_uploader("Upload CSV", type=["csv"])
+# ================== 1️⃣ Keep Only Required Columns ==================
+categorical_cols = ['dept_name', 'title', 'Last_performance_rating']
+numerical_cols = ['salary', 'no_of_projects', 'tenure']
+target = 'left'
 
-if uploaded_file is not None:
-    # Load new data
-    new_data = pd.read_csv(uploaded_file)
+# Keep only the required columns
+final_df = final_df[categorical_cols + numerical_cols + [target]]
 
-    # Preserve Employee ID if available
-    id_cols = ["emp_no"]  # Adjust based on your dataset
-    available_id_cols = [col for col in id_cols if col in new_data.columns]
+X = final_df.drop(columns=[target])  # Features
+y = final_df[target].astype(int)  # Target (Convert to int: 0 = stayed, 1 = left)
 
-    if available_id_cols:
-        ids = new_data[available_id_cols]  # Save IDs
-        new_data = new_data.drop(columns=available_id_cols)  # Drop before prediction
-    else:
-        ids = None  # No IDs available
+# Store feature order before transformation
+feature_order = X.columns.tolist()
 
-    # Ensure correct column order and make predictions
-    try:
-        new_data = new_data[pipeline.feature_order]
+# ================== 2️⃣ Train-Test Split ==================
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
-        # Make predictions
-        predictions = pipeline.predict(new_data)
+# ================== 3️⃣ Define Preprocessing Pipeline ==================
+preprocessor = ColumnTransformer([
+    ('num', StandardScaler(), numerical_cols),
+    ('cat', OneHotEncoder(handle_unknown='ignore', sparse_output=False), categorical_cols)
+])
 
-        # Add Predictions
-        new_data["Prediction"] = ["Leave" if p == 1 else "Stay" for p in predictions]
+# ================== 4️⃣ Define Full Pipeline with SMOTE & XGBoost ==================
+pipeline = ImbPipeline([
+    ('preprocessor', preprocessor),
+    ('smote', SMOTE(random_state=42)),
+    ('classifier', XGBClassifier(n_estimators=100, learning_rate=0.1, max_depth=6, random_state=42))
+])
 
-        # Calculate attrition rate
-        total_employees = len(new_data)
-        employees_leaving = sum(predictions)  # Count of 1s in predictions
-        attrition_rate = (employees_leaving / total_employees) * 100 if total_employees > 0 else 0
+# ================== 5️⃣ Train Model ==================
+pipeline.fit(X_train, y_train)
 
-        # Reattach Employee ID if available
-        if ids is not None:
-            new_data = pd.concat([ids, new_data], axis=1)
+# Store feature order inside pipeline
+pipeline.feature_order = feature_order
 
-        # Display attrition rate metric
-        st.metric(
-            label="Predicted Attrition Rate",
-            value=f"{attrition_rate:.2f}%",
-            delta=f"{employees_leaving} out of {total_employees} employees"
-        )
-
-        # Show results
-        st.write("Prediction Results:")
-        st.write(new_data)
-
-        # Download results
-        csv = new_data.to_csv(index=False).encode("utf-8")
-        st.download_button("Download Predictions", csv, "predictions.csv", "text/csv")
-
-    except KeyError:
-        st.error("Uploaded CSV does not have the correct columns. Please check your file.")
+# Save the trained pipeline
+joblib.dump(pipeline, "ML Model/model_pipeline.pkl")
