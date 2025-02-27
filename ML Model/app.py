@@ -3,7 +3,7 @@ import pandas as pd
 import joblib
 
 # Load trained model
-pipeline = joblib.load("ML Model/model_pipeline.pkl")
+pipeline = joblib.load("model_pipeline.pkl")
 
 # Streamlit App
 st.title("Employee Churn Prediction")
