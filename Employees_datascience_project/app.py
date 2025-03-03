@@ -54,7 +54,7 @@ def check_login(username, password):
 @st.cache_data
 def load_data():
     # Google Drive share link
-    gdrive_link = "https://drive.google.com/file/d/1-RLcc33jBd4YYop6N2ICDFvrUzSNTUhi/view?usp=sharing"
+    gdrive_link = "https://drive.google.com/file/d/1bmRppo8E-HnDflQeU8tBAnd-5XN3yTFn/view?usp=sharing"
     
     # Extract file ID from the link
     file_id = gdrive_link.split('/d/')[1].split('/')[0]
@@ -81,10 +81,7 @@ def load_data():
     # Convert birth_date and hire_date to datetime format
     df['birth_date'] = pd.to_datetime(df['birth_date'], format='%Y-%m-%d', errors='coerce')
     df['hire_date'] = pd.to_datetime(df['hire_date'], format='%Y-%m-%d', errors='coerce')
-
-    # Correct way to calculate age
-    reference_date = pd.Timestamp('1996-01-01')
-    df['age'] = (reference_date - df['birth_date']).dt.days // 365
+    df['hire_date'] = pd.to_datetime(df['hire_date'], format='%Y-%m-%d', errors='coerce')
 
     # Extract hire month
     df['hire_month'] = df['hire_date'].dt.month
