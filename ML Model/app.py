@@ -1,71 +1,39 @@
 import streamlit as st
 import pandas as pd
 import joblib
-import os
 
 # Load trained model
 pipeline = joblib.load("model_pipeline.pkl")
 
-# Automatically load output.csv from the same folder
-csv_path = "output.csv"
-if not os.path.exists(csv_path):
-    st.error(f"Could not find {csv_path} in the same folder as app.py. Please ensure it exists.")
-    st.stop()
-
-try:
-    default_data = pd.read_csv(csv_path)
-except Exception as e:
-    st.error(f"Error loading {csv_path}: {e}")
-    st.stop()
-
 # Define the features used in the model and input
-MODEL_FEATURES = ['sex', 'title', 'Last_performance_rating', 'age_group', 'tenure_group']
-INPUT_FEATURES = ['sex', 'title', 'Last_performance_rating', 'age', 'tenure']
+MODEL_FEATURES = ['sex', 'title', 'dept_name', 'Last_performance_rating', 'age_group', 'tenure_group']
+INPUT_FEATURES = ['sex', 'title', 'dept_name', 'Last_performance_rating', 'age', 'tenure']
 
-# Extract features and their possible values/ranges from output.csv
-def extract_features(data, input_features):
+# Extract categorical options from the pipeline's OneHotEncoder
+def extract_categorical_options(pipeline):
+    ohe = pipeline.named_steps['preprocessor'].named_transformers_['cat']
+    categorical_cols = ['sex', 'title', 'dept_name', 'Last_performance_rating', 'age_group', 'tenure_group']
     features = {}
-    for column in input_features:
-        if column in data.columns:
-            if data[column].dtype == "object" or data[column].nunique() < 10:
-                features[column] = sorted(data[column].dropna().unique().tolist())
-            elif column in ['age', 'tenure']:
-                min_val = int(data[column].min())
-                max_val = int(data[column].max())
-                features[column] = (min_val, max_val)
-        else:
-            st.error(f"Column '{column}' not found in {csv_path}. Please check your CSV.")
-            st.stop()
+    for i, col in enumerate(categorical_cols):
+        features[col] = ohe.categories_[i].tolist()
     return features
 
-FEATURES = extract_features(default_data, INPUT_FEATURES)
+# Define FEATURES without loading a CSV
+FEATURES = extract_categorical_options(pipeline)
+FEATURES['age'] = (18, 100)  # Reasonable range for age
+FEATURES['tenure'] = (0, 50)  # Reasonable range for tenure
 
-# Function to map age and tenure to their respective groups
-def get_groups(data, age, tenure):
-    # Find the matching row in output.csv (assuming age and tenure combinations are unique enough)
-    matching_row = data[(data['age'] == age) & (data['tenure'] == tenure)]
-    if not matching_row.empty:
-        return matching_row['age_group'].iloc[0], matching_row['tenure_group'].iloc[0]
-    else:
-        # Fallback: Find closest age and tenure if exact match not found
-        closest_age = data.loc[(data['age'] - age).abs().idxmin()]
-        closest_tenure = data.loc[(data['tenure'] - tenure).abs().idxmin()]
-        return closest_age['age_group'], closest_tenure['tenure_group']
-
-# Initialize session state for authentication
-if "authenticated" not in st.session_state:
-    st.session_state["authenticated"] = False
+# Function to map age and tenure to their groups using stored bins
+def get_groups(age, tenure, pipeline):
+    age_group = pd.cut([age], bins=pipeline.age_bins, labels=pipeline.age_labels, include_lowest=True)[0]
+    tenure_group = pd.cut([tenure], bins=pipeline.tenure_bins, labels=pipeline.tenure_labels, include_lowest=True)[0]
+    return age_group, tenure_group
 
 # Login function
 def check_login(username, password):
     expected_username = "admin"
     expected_password = "1999"
-    if username == expected_username and password == expected_password:
-        st.success("Login successful!")
-        return True
-    else:
-        st.error("Incorrect username or password.")
-        return False
+    return username == expected_username and password == expected_password
 
 # Main app function
 def main_app():
@@ -78,24 +46,24 @@ def main_app():
         st.write(f"Enter employee details to predict churn (based on features: {', '.join(INPUT_FEATURES)}).")
         
         input_data = {}
-        for feature, options in FEATURES.items():
-            if isinstance(options, list):  # Categorical
-                input_data[feature] = st.selectbox(f"{feature.capitalize()}", options)
-            elif isinstance(options, tuple):  # Numerical (age, tenure)
-                min_val, max_val = options
+        for feature in INPUT_FEATURES:
+            if feature in ['age', 'tenure']:
+                min_val, max_val = FEATURES[feature]
                 input_data[feature] = st.number_input(
                     f"{feature.capitalize()}",
                     min_value=min_val,
                     max_value=max_val,
                     step=1
                 )
+            else:
+                input_data[feature] = st.selectbox(f"{feature.capitalize()}", FEATURES[feature])
         
         if st.button("Predict"):
-            # Map age and tenure to their groups from output.csv
-            age_group, tenure_group = get_groups(default_data, input_data['age'], input_data['tenure'])
+            age_group, tenure_group = get_groups(input_data['age'], input_data['tenure'], pipeline)
             input_data_processed = {
                 'sex': input_data['sex'],
                 'title': input_data['title'],
+                'dept_name': input_data['dept_name'],
                 'Last_performance_rating': input_data['Last_performance_rating'],
                 'age_group': age_group,
                 'tenure_group': tenure_group
@@ -103,7 +71,7 @@ def main_app():
             input_df = pd.DataFrame([input_data_processed])
             
             try:
-                input_df = input_df[pipeline.feature_order]  # Align with training order
+                input_df = input_df[pipeline.feature_order]
                 prediction = pipeline.predict(input_df)[0]
                 result = "Leave" if prediction == 1 else "Stay"
                 st.success(f"Prediction: **{result}**")
@@ -115,29 +83,51 @@ def main_app():
         uploaded_file = st.file_uploader("Upload CSV", type=["csv"])
         if uploaded_file is not None:
             new_data = pd.read_csv(uploaded_file)
+            
+            # Define required columns (still need dates from CSV to calculate age/tenure)
+            required_cols = {'sex', 'title', 'dept_name', 'Last_performance_rating', 'hire_date', 'birth_date', 'last_date'}
             id_cols = ["emp_no"]
+            
+            # Check for required columns
+            if not required_cols.issubset(new_data.columns):
+                st.error(f"Uploaded CSV must contain columns: {', '.join(required_cols)}")
+                st.stop()
+            
+            # Select only required columns and optional ID column
+            cols_to_keep = list(required_cols) + [col for col in id_cols if col in new_data.columns]
+            new_data = new_data[cols_to_keep]
+            
+            # Extract IDs if present
             available_id_cols = [col for col in id_cols if col in new_data.columns]
             if available_id_cols:
                 ids = new_data[available_id_cols]
-                new_data = new_data.drop(columns=available_id_cols)
             else:
                 ids = None
             
-            # Keep original age and tenure for display
-            if 'age' in new_data.columns and 'tenure' in new_data.columns:
-                original_data = new_data[INPUT_FEATURES].copy()  # Store input features for display
-                new_data[['age_group', 'tenure_group']] = new_data.apply(
-                    lambda row: pd.Series(get_groups(default_data, row['age'], row['tenure'])), 
-                    axis=1
-                )
-            else:
-                original_data = new_data[INPUT_FEATURES].copy()  # If no age/tenure, use what's available
+            # Preprocess raw date columns to calculate age and tenure
+            new_data['hire_date'] = pd.to_datetime(new_data['hire_date'], format='%Y-%m-%d')
+            new_data['birth_date'] = pd.to_datetime(new_data['birth_date'], format='%Y-%m-%d')
+            new_data['last_date'] = pd.to_datetime(new_data['last_date'], format='%Y-%m-%d')
+            new_data['last_date'] = new_data['last_date'].fillna(new_data['last_date'].max())
+            new_data['age'] = (new_data['last_date'] - new_data['birth_date']).dt.days // 365
+            new_data['tenure'] = (new_data['last_date'] - new_data['hire_date']).dt.days // 365
+            new_data['age_group'] = pd.cut(new_data['age'], 
+                                          bins=pipeline.age_bins, 
+                                          labels=pipeline.age_labels, 
+                                          include_lowest=True)
+            new_data['tenure_group'] = pd.cut(new_data['tenure'], 
+                                             bins=pipeline.tenure_bins, 
+                                             labels=pipeline.tenure_labels, 
+                                             include_lowest=True)
             
+            # Prepare data for prediction
             try:
-                predict_data = new_data[MODEL_FEATURES]  # Use model features for prediction
-                predict_data = predict_data[pipeline.feature_order]  # Align with training order
+                predict_data = new_data[MODEL_FEATURES]
+                predict_data = predict_data[pipeline.feature_order]
                 predictions = pipeline.predict(predict_data)
-                # Create result table with original input features and prediction
+                
+                # Use INPUT_FEATURES (with age and tenure) for display instead of dates
+                original_data = new_data[INPUT_FEATURES].copy()
                 result_data = original_data.copy()
                 result_data["Prediction"] = ["Leave" if p == 1 else "Stay" for p in predictions]
                 total_employees = len(result_data)
@@ -155,9 +145,12 @@ def main_app():
                 csv = result_data.to_csv(index=False).encode("utf-8")
                 st.download_button("Download Predictions", csv, "predictions.csv", "text/csv")
             except KeyError:
-                st.error(f"Uploaded CSV must have columns: {', '.join(pipeline.feature_order)} or 'age' and 'tenure'")
+                st.error(f"Error: Ensure CSV has required columns: {', '.join(pipeline.feature_order)}")
 
-# Conditional rendering based on authentication state
+# Conditional rendering for login
+if "authenticated" not in st.session_state:
+    st.session_state["authenticated"] = False
+
 if not st.session_state["authenticated"]:
     st.title("Login")
     st.write("Please log in to access the Employee Churn Prediction app.")
