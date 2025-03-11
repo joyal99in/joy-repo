@@ -145,7 +145,7 @@ def main_app():
                 f"{(len(filtered_df[filtered_df['left'] == True]) / len(filtered_df) * 100):.1f}%")
 
     # Tabs for different visualizations
-    tab1, tab2, tab3 = st.tabs(["Demographics", "Compensation Analysis", "Performance Metrics"])
+    tab1, tab2, tab3 = st.tabs(["Demographics Analysis", "Compensation Analysis", "Performance Metrics"])
 
     with tab1:
         st.header("Demographic Insights")
@@ -157,8 +157,8 @@ def main_app():
             # Age distribution
             plt.figure(figsize=(4, 2.9))
             plt.hist(filtered_df['age'], color='skyblue')
-            plt.title('Histogram of Age', fontsize=12, fontweight='bold')
-            plt.ylabel('Frequency', fontweight='bold')
+            plt.title('Age Distribution', fontsize=12, fontweight='bold')
+            plt.ylabel('Number of Employees', fontweight='bold')
             st.pyplot(plt, use_container_width=False)
         
         with col2:
@@ -195,7 +195,7 @@ def main_app():
                 bars = plt.bar(gender_dept.index, gender_dept['M/F Ratio'], color='skyblue', edgecolor='black')
                 plt.gca().bar_label(bars, fmt='%.2f')
                 plt.xlabel("Department")
-                plt.ylabel("Male to Female Ratio", fontweight='bold')
+                plt.ylabel("Male to Female Ratio")
                 plt.xticks(rotation=45, ha='right')
                 plt.grid(axis='y', linestyle='--', alpha=0.7)
                 plt.ylim(0, 2)
@@ -249,10 +249,10 @@ def main_app():
             plt.figure(figsize=(10,6))
             ratings.plot(kind='bar', color='gold', edgecolor='black')
             plt.title('Performance Rating Distribution', fontsize=16, fontweight='bold')
-            plt.ylabel('Count')
+            plt.ylabel('Number of Employees')
             st.pyplot(plt, use_container_width=False)
         
-        st.subheader("Employee Turnover")
+        st.subheader("Employees left")
         data = filtered_df['left'].value_counts()
         plt.figure(figsize=(1.5, 1.5))
         plt.pie(data, labels=data.index,
