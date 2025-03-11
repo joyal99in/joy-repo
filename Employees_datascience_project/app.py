@@ -158,7 +158,7 @@ def main_app():
             plt.figure(figsize=(4, 2.9))
             plt.hist(filtered_df['age'], color='skyblue')
             plt.title('Age Distribution', fontsize=12, fontweight='bold')
-            plt.ylabel('Number of Employees', fontweight='bold')
+            plt.ylabel('Number of Employees')
             st.pyplot(plt, use_container_width=False)
         
         with col2:
