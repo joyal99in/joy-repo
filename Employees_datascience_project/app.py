@@ -3,6 +3,8 @@ import pandas as pd
 import plotly.express as px
 import numpy as np
 import calendar
+import requests
+from io import StringIO
 
 # Enable wide layout for better content spacing
 st.set_page_config(layout="wide")
@@ -31,14 +33,49 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+# Initialize session state for authentication
+if "authenticated" not in st.session_state:
+    st.session_state["authenticated"] = False
+
+# Login function
+def check_login(username, password):
+    expected_username = "admin"
+    expected_password = "1999"
+    if username == expected_username and password == expected_password:
+        st.success("Login successful!")
+        return True
+    else:
+        st.error("Incorrect username or password.")
+        return False
+    
 # Load and process data
 @st.cache_data
 def load_data():
+    # Google Drive share link
+    gdrive_link = "https://drive.google.com/file/d/1uA6FVHM1MPrLUba1XoaIcIsynXeCAC0v/view?usp=sharing"
+    
+    # Extract file ID from the link
+    file_id = gdrive_link.split('/d/')[1].split('/')[0]
+    
+    # Construct the direct download URL
+    download_url = f"https://drive.google.com/uc?export=download&id={file_id}"
+    
+    # Fetch the CSV file
     try:
-        df = pd.read_csv("output.csv", on_bad_lines='warn')
-    except Exception as e:
-        st.error(f"Failed to load data: {e}")
+        response = requests.get(download_url)
+        response.raise_for_status()  # Raise an error if the request fails
+    except requests.exceptions.RequestException as e:
+        st.error(f"Failed to fetch data from Google Drive: {e}")
         return None
+
+    # Try to parse the CSV content
+    try:
+        csv_content = StringIO(response.text)
+        df = pd.read_csv(csv_content, on_bad_lines='warn')
+    except pd.errors.ParserError as e:
+        st.error(f"Error parsing CSV: {e}")
+        return None
+
     
     df['birth_date'] = pd.to_datetime(df['birth_date'], format='%Y-%m-%d', errors='coerce')
     df['hire_date'] = pd.to_datetime(df['hire_date'], format='%Y-%m-%d', errors='coerce')
@@ -186,4 +223,15 @@ def main_app():
     st.markdown("---")
     st.caption("Employee Analytics Dashboard - Created with Streamlit")
 
-main_app()
+# Conditional rendering based on authentication state
+if not st.session_state["authenticated"]:
+    st.title("Login")
+    st.write("Please log in to access the Employee Data Analytics Dashboard.")
+    username = st.text_input("Username", value="")
+    password = st.text_input("Password", type="password", value="")
+    if st.button("Login"):
+        if check_login(username, password):
+            st.session_state["authenticated"] = True
+            st.rerun()
+else:
+    main_app()
