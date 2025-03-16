@@ -135,27 +135,53 @@ def main_app():
                 nbins=20, 
                 color_discrete_sequence=['skyblue']
             )
-
-            # Update Y-axis title
-            fig.update_layout(yaxis_title="Number of Employees")
-
+            fig.update_layout(xaxis_title="Age", yaxis_title="Number of Employees")
             st.plotly_chart(fig, use_container_width=True)
 
-        
         with col2:
-            filtered_df=filtered_df.drop_duplicates(subset='emp_no',keep='first')
-            fig = px.pie(filtered_df, names='sex', title='Gender Distribution')
+            filtered_df = filtered_df.drop_duplicates(subset='emp_no', keep='first')
+            gender_counts = filtered_df['sex'].value_counts().reset_index()
+            gender_counts.columns = ['sex', 'count']
+            fig = px.pie(
+                gender_counts, 
+                names='sex', 
+                values='count', 
+                title='Gender Distribution'
+            )
+            fig.update_traces(
+                hovertemplate='%{label}: %{value} employees (%{percent})'
+            )
             st.plotly_chart(fig, use_container_width=True)
         
         col3, col4 = st.columns(2)
 
         with col3:
-            fig = px.pie(filtered_df, names='dept_name', title='Employee Distribution by Department')
+            dept_counts = filtered_df['dept_name'].value_counts().reset_index()
+            dept_counts.columns = ['dept_name', 'count']
+            fig = px.pie(
+                dept_counts, 
+                names='dept_name', 
+                values='count', 
+                title='Employee Distribution by Department'
+            )
+            fig.update_traces(
+                hovertemplate='%{label}: %{value} employees (%{percent})'
+            )
             st.plotly_chart(fig, use_container_width=True)
 
         with col4:
-            filtered_df=filtered_df.drop_duplicates(subset='emp_no',keep='first')
-            fig = px.pie(filtered_df, names='title', title='Employee Distribution by Job Title')
+            filtered_df = filtered_df.drop_duplicates(subset='emp_no', keep='first')
+            title_counts = filtered_df['title'].value_counts().reset_index()
+            title_counts.columns = ['title', 'count']
+            fig = px.pie(
+                title_counts, 
+                names='title', 
+                values='count', 
+                title='Employee Distribution by Job Title'
+            )
+            fig.update_traces(
+                hovertemplate='%{label}: %{value} employees (%{percent})'
+            )
             st.plotly_chart(fig, use_container_width=True)
 
     with tab2:
@@ -164,11 +190,13 @@ def main_app():
         with col1:
             data = filtered_df.sort_values(by='salary', ascending=False)
             fig = px.box(data, x='dept_name', y='salary', title='Salary Distribution by Department')
+            fig.update_layout(xaxis_title="Department",yaxis_title="Salary")
             st.plotly_chart(fig, use_container_width=True)
         
         with col2:
             data = filtered_df.drop_duplicates(subset=['emp_no']).sort_values(by='salary', ascending=False)
-            fig = px.box(data, x='title', y='salary', title='Salary Distribution by Job Title')
+            fig = px.box(data, x='title', y='salary', title='Salary Distribution by Job Title',points="outliers")
+            fig.update_layout(xaxis_title="Title",yaxis_title="Salary")
             st.plotly_chart(fig, use_container_width=True)
 
     with tab3:
