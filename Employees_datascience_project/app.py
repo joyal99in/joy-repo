@@ -195,7 +195,7 @@ def main_app():
         
         with col2:
             data = filtered_df.drop_duplicates(subset=['emp_no']).sort_values(by='salary', ascending=False)
-            fig = px.box(data, x='title', y='salary', title='Salary Distribution by Job Title',points="outliers")
+            fig = px.box(data, x='title', y='salary', title='Salary Distribution by Title',points="outliers")
             fig.update_layout(xaxis_title="Title",yaxis_title="Salary")
             st.plotly_chart(fig, use_container_width=True)
 
