@@ -97,7 +97,7 @@ def main_app():
         return options if selected_option == default_label else [selected_option]
 
     dept_filter = dropdown_with_select_all("Select Department", final_df['dept_name'].unique().tolist())
-    title_filter = dropdown_with_select_all("Select Job Title", final_df['title'].unique().tolist())
+    title_filter = dropdown_with_select_all("Select Title", final_df['title'].unique().tolist())
     gender_filter = dropdown_with_select_all("Select Gender", final_df['sex'].unique().tolist())
     left_filter = dropdown_with_select_all("Select Employment Status", final_df['left'].unique().tolist())
 
@@ -177,7 +177,7 @@ def main_app():
                 title_counts, 
                 names='title', 
                 values='count', 
-                title='Employee Distribution by Job Title'
+                title='Employee Distribution by Title'
             )
             fig.update_traces(
                 hovertemplate='%{label}: %{value} employees (%{percent})'
@@ -207,7 +207,7 @@ def main_app():
             ratings = filtered_df['Last_performance_rating'].value_counts().reset_index()
             ratings.columns = ['Rating', 'Count']
             
-            fig = px.pie(ratings, names='Rating', values='Count', title='Performance Rating Distribution', color_discrete_sequence=px.colors.sequential.Sunset)
+            fig = px.pie(ratings, names='Rating', values='Count', title='Last Performance Rating Distribution', color_discrete_sequence=px.colors.sequential.Sunset)
             
             st.plotly_chart(fig, use_container_width=True)
 
