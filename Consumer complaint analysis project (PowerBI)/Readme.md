@@ -1,9 +1,17 @@
-Business Context:
-As a data analyst , I've been tasked with analysing consumer complains data of banks and other financial institutions for a regulatory agencies 
-assessment.
+## 📊 Business Context
 
-Output:
-Power BI was utilized to pinpoint key performance indicators (KPIs) linked to reported 
-complaints and resolution times. Additionally, the interactive capabilities of Power BI were leveraged to 
-create dynamic visuals, allowing users to filter and drill down for detailed insights
+As a **Data Analyst**, I have been tasked with analyzing **consumer complaints data** from banks and other financial institutions for a **regulatory agency's assessment**.
 
+---
+
+## 💡 Output
+
+- **Power BI** was used to identify key performance indicators (**KPIs**) related to:
+  - Reported complaints
+  - Resolution times
+  
+- The **interactive features** of Power BI enabled:
+  - Creation of **dynamic visualizations**
+  - Filter and **drill-down** capabilities for deeper insights.
+
+---
