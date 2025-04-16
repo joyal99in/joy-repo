@@ -1,16 +1,33 @@
-BUSINESS CONTEXT:
-Our client is an e-commerce retail startup that sells stuffed animal toys. The CEO of the company is planning to secure next round of funding, she needs the analytics team’s help to tell a compelling story to investors. Therefore, the client wants dashboards for different stakeholders which helps in tracking business metrics and KPIs regularly, so that the stakeholders can make data-driven decisions to improve the company’s performance.
+## 🧸 Business Context
 
-In addition to this, the Analytics team needs to provide a detailed analysis of company performance and new product analysis.
+Our client is an **e-commerce retail startup** specializing in the sale of **stuffed animal toys**.  
 
-DATA AVAILABILITY:
-This project utilizes a custom-built e-commerce database. 
+As the company prepares to secure its **next round of funding**, the CEO has tasked the **Analytics Team** with:
 
-The database contains six related tables with eCommerce data about:
-• Website Activity
-• Products
-• Orders
+- Crafting a **compelling data-driven growth story** for potential investors.
+- Building dashboards that enable stakeholders to monitor **business metrics** and **KPIs** on a regular basis.
+- Supporting data-driven decision-making aimed at improving business performance.
 
-CLIENT REQUIREMENT
-1. Dashboard for Stakeholders: To track performance regularly
-2. Detailed Analysis of Performance: To create a presentation for Funding on a data-driven growth story for potential investors
+In addition to investor-focused insights, the team is responsible for providing a **detailed analysis of company performance** and **new product analysis** to identify growth opportunities.
+
+---
+
+## 💾 Data Availability
+
+This project uses a **custom-built e-commerce database** containing six related tables. The data covers:
+
+- 🖥️ **Website Activity**  
+- 🧸 **Products**  
+- 📦 **Orders**  
+
+---
+
+## 🧠 Client Requirements
+
+1. **Dashboard for Stakeholders**  
+   - Track key business metrics and performance regularly.
+
+2. **Detailed Analysis of Performance**  
+   - Prepare a presentation for investors, showcasing the company’s **data-driven growth story**.
+
+---
