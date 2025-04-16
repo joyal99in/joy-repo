@@ -11,6 +11,6 @@ The database contains six related tables with eCommerce data about:
 • Products
 • Orders
 
-Client Requirement:
+CLIENT REQUIREMENT
 1. Dashboard for Stakeholders: To track performance regularly
 2. Detailed Analysis of Performance: To create a presentation for Funding on a data-driven growth story for potential investors
