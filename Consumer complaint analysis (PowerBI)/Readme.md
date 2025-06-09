@@ -1,7 +1,9 @@
-📊 Business Context  
+# 📊 Consumer Complaint Analysis (Power BI)
+
+## 📌 Business Context  
 As a Data Analyst, I have been tasked with analyzing consumer complaints data from banks and other financial institutions for a regulatory agency's assessment.
 
-💡 Output  
+## 💡 Output  
 Power BI was used to identify key performance indicators (KPIs) related to:
 
 - Reported complaints  
@@ -12,8 +14,5 @@ The interactive features of Power BI enabled:
 - Creation of dynamic visualizations  
 - Filter and drill-down capabilities for deeper insights
 
-📈 Sample Dashboard  
-![Dashboard](![Dashboard](https://raw.githubusercontent.com/joyal99in/joy-repo/main/Consumer%20complaint%20analysis%20%28PowerBI%29/Consumer%20complaint%20Dasboard%201.png)
-)
-
-
+## 📈 Sample Dashboard  
+![Dashboard](https://raw.githubusercontent.com/joyal99in/joy-repo/main/Consumer%20complaint%20analysis%20%28PowerBI%29/Consumer%20complaint%20Dasboard%201.png)
