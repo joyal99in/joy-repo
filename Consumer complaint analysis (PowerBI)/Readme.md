@@ -12,5 +12,4 @@ The interactive features of Power BI enabled:
 - Creation of dynamic visualizations  
 - Filter and drill-down capabilities for deeper insights
 
-📈 Sample Dashboard  
-![Consumer Complaint Dashboard](Consumer%20complaint%20analysis%20%28PowerBI%29/Consumer%20complaint%20Dasboard%201.png)
+
