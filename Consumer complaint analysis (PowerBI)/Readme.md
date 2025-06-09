@@ -14,5 +14,9 @@ The interactive features of Power BI enabled:
 - Creation of dynamic visualizations  
 - Filter and drill-down capabilities for deeper insights
 
-## 📈 Sample Dashboard  
-![Dashboard](https://raw.githubusercontent.com/joyal99in/joy-repo/main/Consumer%20complaint%20analysis%20%28PowerBI%29/Consumer%20complaint%20Dasboard%201.png)
+## 📈 Sample Dashboards  
+
+![Dashboard 1](https://raw.githubusercontent.com/joyal99in/joy-repo/main/Consumer%20complaint%20analysis%20%28PowerBI%29/Consumer%20complaint%20Dasboard%201.png)
+
+![Dashboard 2](https://raw.githubusercontent.com/joyal99in/joy-repo/main/Consumer%20complaint%20analysis%20%28PowerBI%29/Consumer%20complaint%20Dashboard%202.png)
+
