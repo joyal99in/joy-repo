@@ -42,3 +42,5 @@ This project uses a **custom-built e-commerce database** containing six related 
 
 ![mydas](https://github.com/joyal99in/joy-repo/blob/9e865db62475f555146506e484ff218dab8fa450/Digital%20analysis%20for%20an%20E-commerce%20company/Main%20Dashboard.png)
 ---
+
+![mydahjhjhs](https://github.com/joyal99in/joy-repo/blob/main/Digital%20analysis%20for%20an%20E-commerce%20company/Main%20Dashboard.png?raw=true)
