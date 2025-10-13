@@ -30,6 +30,7 @@ This project uses a **custom-built e-commerce database** containing six related 
 2. **Detailed Analysis of Performance**  
    - Prepare a presentation for investors, showcasing the company’s **data-driven growth story**.
 
-![E-commerce Main Dashboard](Digital%20analysis%20for%20an%20E-commerce%20company/Main%20Dashboard.png)
+![E-commerce Main Dashboard](https://raw.githubusercontent.com/joyal99in/joy-repo/main/Digital%20analysis%20for%20an%20E-commerce%20company/Main%20Dashboard.png)
+
 
 ---
