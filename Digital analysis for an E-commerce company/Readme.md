@@ -32,12 +32,10 @@ This project uses a **custom-built e-commerce database** containing six related 
 
 ### 📊 Dashboards
 
-**Main Dashboard**
 ![E-commerce Main Dashboard](https://raw.githubusercontent.com/joyal99in/joy-repo/main/Digital%20analysis%20for%20an%20E-commerce%20company/Main%20Dashboard.png)
 
 ---
 
-**Conversion Funnel Dashboard**
 ![Conversion Funnel Dashboard](https://raw.githubusercontent.com/joyal99in/joy-repo/main/Digital%20analysis%20for%20an%20E-commerce%20company/Conversion%20Funnel%20Dashboard.png)
 
 
