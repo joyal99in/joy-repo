@@ -38,4 +38,4 @@ This project uses a **custom-built e-commerce database** containing six related 
 
 ![Conversion Funnel Dashboard](https://github.com/joyal99in/joyal99in/joy-repo/main/Digital%20analysis%20for%20an%20E-commerce%20company/Conversion%20Funnel%20Dashboard.png?raw=true)
 
-
+---
